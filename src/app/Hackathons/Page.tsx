@@ -5,26 +5,6 @@ import CourseCard from "./Components/CourseCard";
 import Filter from "./Components/Filter";
 import AiAssistantButton from "./Components/AiAssitantButton";
 
-interface Hackathon {
-  id: string;
-  name: string;
-  website: string;
-  start: string;
-  end: string;
-  createdAt: string;
-  logo: string;
-  banner: string;
-  city: string;
-  state: string;
-  country: string;
-  countryCode: string;
-  latitude: number;
-  longitude: number;
-  virtual: boolean;
-  hybrid: boolean;
-  mlhAssociated: boolean;
-  apac: boolean;
-}
 
 export const Page = () => {
   const [allHackathons, setAllHackathons] = useState<Hackathon[]>([]);
@@ -1181,71 +1161,82 @@ export const Page = () => {
         // In a real app, you would fetch from API
         // const response = await fetch('https://hackathons.hackclub.com/api/events/all');
         // const data = await response.json();
-
+  
         // Using sample data for now
         setAllHackathons(hackathons);
-        applyFilters(hackathons); // Initialize filtered hackathons
+        applyFilters(hackathons);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching hackathons:", error);
         setLoading(false);
       }
     };
-
+  
     fetchHackathons();
   }, []);
-
+  
   // Apply filters whenever filter states change
   useEffect(() => {
-    applyFilters(allHackathons);
+    // Only apply filters if we have hackathons to filter
+    if (allHackathons && allHackathons.length > 0) {
+      applyFilters(allHackathons);
+    }
   }, [locationFilter, virtualFilter, hybridFilter, allHackathons]);
-
+  
   const applyFilters = (hackathons: Hackathon[]) => {
+    // Guard clause for empty hackathon array
+    if (!hackathons || hackathons.length === 0) {
+      setFilteredHackathons([]);
+      setDisplayCount(10);
+      return;
+    }
+  
     let filtered = [...hackathons];
-
-    // Apply location filter if set
-    if (locationFilter) {
-      const search = locationFilter.toLowerCase();
+  
+    // Apply location filter if set and not empty
+    if (locationFilter && locationFilter.trim() !== '') {
+      const search = locationFilter.toLowerCase().trim();
       filtered = filtered.filter(
         (h) =>
-          h.city.toLowerCase().includes(search) ||
-          h.state.toLowerCase().includes(search) ||
-          h.country.toLowerCase().includes(search)
+          (h.city && h.city.toLowerCase().includes(search)) ||
+          (h.state && h.state.toLowerCase().includes(search)) ||
+          (h.country && h.country.toLowerCase().includes(search))
       );
     }
-
+  
     // Apply virtual filter if set
     if (virtualFilter !== null) {
       filtered = filtered.filter((h) => h.virtual === virtualFilter);
     }
-
+  
     // Apply hybrid filter if set
     if (hybridFilter !== null) {
       filtered = filtered.filter((h) => h.hybrid === hybridFilter);
     }
-
+  
     // Update filtered results and reset display count
     setFilteredHackathons(filtered);
     setDisplayCount(10);
   };
-
+  
   const handleFilterChange = (
     location: string,
     virtual: boolean | null,
     hybrid: boolean | null
   ) => {
-    setLocationFilter(location);
+    // Ensure location is always a string, even if undefined or null
+    setLocationFilter(location || '');
     setVirtualFilter(virtual);
     setHybridFilter(hybrid);
   };
-
+  
   const loadMoreHackathons = () => {
     setDisplayCount((prevCount) => prevCount + 10);
   };
-
+  
   // Get displayed hackathons based on current display count
   const displayedHackathons = filteredHackathons.slice(0, displayCount);
-
+  
   return (
     <div className="min-h-screen bg-white">
       <Head>
@@ -1256,7 +1247,7 @@ export const Page = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
+  
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <Filter
           onFilterChange={handleFilterChange}
@@ -1264,7 +1255,7 @@ export const Page = () => {
           virtualFilter={virtualFilter}
           hybridFilter={hybridFilter}
         />
-
+  
         <div className="mt-8">
           {loading ? (
             <div className="flex justify-center">
@@ -1273,26 +1264,45 @@ export const Page = () => {
           ) : (
             <div>
               {filteredHackathons.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-lg text-gray-600">
+                <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className="h-8 w-8 text-gray-400" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-lg text-gray-600 font-medium">
                     No hackathons found matching your filters.
                   </p>
+                  <p className="text-gray-500 mt-2">Try adjusting your search criteria.</p>
+                  <button
+                    onClick={() => handleFilterChange('', null, null)}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  >
+                    Reset Filters
+                  </button>
                 </div>
               ) : (
                 <>
+                  <p className="text-gray-600 mb-4">Found {filteredHackathons.length} hackathon{filteredHackathons.length !== 1 ? 's' : ''}</p>
                   <div className="grid gap-8 md:grid-cols-2">
                     {displayedHackathons.map((hackathon) => (
                       <CourseCard key={hackathon.id} hackathon={hackathon} />
                     ))}
                   </div>
-
+  
                   {displayCount < filteredHackathons.length && (
                     <div className="flex justify-center mt-8">
                       <button
                         onClick={loadMoreHackathons}
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors shadow-sm"
                       >
-                        Load More
+                        Load More ({filteredHackathons.length - displayCount} remaining)
                       </button>
                     </div>
                   )}
@@ -1302,10 +1312,10 @@ export const Page = () => {
           )}
         </div>
       </main>
-
+  
       <AiAssistantButton />
     </div>
   );
-};
+}
 
 export default Page;
