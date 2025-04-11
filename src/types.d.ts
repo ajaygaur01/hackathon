@@ -1,29 +1,24 @@
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  author: string;
-  authorImage?: string;
-  category: string;
-  date: string;
-  views: number;
-  comments: number;
-  image: string;
-  isVerified?: boolean;
-}
-
-interface CourseCardProps {
-  course: {
+interface Hackathon {
     id: string;
-    title: string;
-    description: string;
-    author: string;
-    authorImage?: string;
-    category: string;
-    date: string;
-    views: number;
-    comments: number;
-    image: string;
-    isVerified?: boolean;
-  };
-}
+    name: string;
+    website: string;
+    start: string;
+    end: string;
+    createdAt: string;
+    logo: string | null;
+    banner: string | null ;
+    city: string | null;
+    state: string | null;
+    country: string | null;
+    countryCode: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    virtual: boolean;
+    hybrid: boolean;
+    mlhAssociated: boolean;
+    apac: boolean;
+  }
+  
+  interface HackathonCardProps {
+    hackathon: Hackathon;
+  }

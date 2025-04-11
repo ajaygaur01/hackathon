@@ -1,9 +1,15 @@
-import Image from "next/image";
+'use client';
+import React from 'react';
+import Hackathon from './Hackathons/Page';
 
-export default function Home() {
+const Home = () => {
   return (
    <>
-   <h1>Hello World</h1>
+    <div>
+      <Hackathon />
+    </div>
    </>
   );
 }
+
+export default Home;
