@@ -1,173 +1,116 @@
-// src/components/FilterOptions.tsx
+// src/pages/Components/Filter.tsx
 import React, { useState } from 'react';
 
-interface FilterOptionsProps {
-  onFilterChange: (filters: FilterState) => void;
+interface FilterProps {
+  onFilterChange: (location: string, virtual: boolean | null, hybrid: boolean | null) => void;
+  locationFilter: string;
+  virtualFilter: boolean | null;
+  hybridFilter: boolean | null;
 }
 
-export interface FilterState {
-  format: string[];
-  location: string[];
-  date: string[];
-}
+const Filter: React.FC<FilterProps> = ({ 
+  onFilterChange, 
+  locationFilter, 
+  virtualFilter, 
+  hybridFilter 
+}) => {
+  // Local state to manage form inputs
+  const [location, setLocation] = useState(locationFilter);
+  const [virtual, setVirtual] = useState<string>(
+    virtualFilter === null ? 'all' : virtualFilter ? 'yes' : 'no'
+  );
+  const [hybrid, setHybrid] = useState<string>(
+    hybridFilter === null ? 'all' : hybridFilter ? 'yes' : 'no'
+  );
 
-const FilterOptions: React.FC<FilterOptionsProps> = ({ onFilterChange }) => {
-  const [filters, setFilters] = useState<FilterState>({
-    format: [],
-    location: [],
-    date: []
-  });
+  // Apply filters
+  const applyFilters = () => {
+    onFilterChange(
+      location,
+      virtual === 'all' ? null : virtual === 'yes',
+      hybrid === 'all' ? null : hybrid === 'yes'
+    );
+  };
 
-  const handleFilterChange = (category: keyof FilterState, value: string) => {
-    const updatedFilters = { ...filters };
-    
-    if (updatedFilters[category].includes(value)) {
-      // Remove the filter if already selected
-      updatedFilters[category] = updatedFilters[category].filter(item => item !== value);
-    } else {
-      // Add the filter
-      updatedFilters[category] = [...updatedFilters[category], value];
-    }
-    
-    setFilters(updatedFilters);
-    onFilterChange(updatedFilters);
+  // Reset filters
+  const resetFilters = () => {
+    setLocation('');
+    setVirtual('all');
+    setHybrid('all');
+    onFilterChange('', null, null);
   };
 
   return (
-    <div className="mb-6 bg-gray-50 p-4 rounded-lg">
-      <div className="mb-4">
-        <h3 className="text-lg font-medium mb-2">Filter Events</h3>
-        <div className="flex flex-wrap gap-4">
-          <div>
-            <h4 className="text-sm font-medium mb-1">Format</h4>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleFilterChange('format', 'In-Person')}
-                className={`px-3 py-1 text-sm rounded-full ${
-                  filters.format.includes('In-Person')
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                In-Person
-              </button>
-              <button
-                onClick={() => handleFilterChange('format', 'Virtual')}
-                className={`px-3 py-1 text-sm rounded-full ${
-                  filters.format.includes('Virtual')
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                Virtual
-              </button>
-            </div>
-          </div>
-          
-          <div>
-            <h4 className="text-sm font-medium mb-1">Region</h4>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleFilterChange('location', 'US')}
-                className={`px-3 py-1 text-sm rounded-full ${
-                  filters.location.includes('US')
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                US
-              </button>
-              <button
-                onClick={() => handleFilterChange('location', 'APAC')}
-                className={`px-3 py-1 text-sm rounded-full ${
-                  filters.location.includes('APAC')
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                APAC
-              </button>
-            </div>
-          </div>
-          
-          <div>
-            <h4 className="text-sm font-medium mb-1">Time</h4>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleFilterChange('date', 'Upcoming')}
-                className={`px-3 py-1 text-sm rounded-full ${
-                  filters.date.includes('Upcoming')
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                Upcoming
-              </button>
-              <button
-                onClick={() => handleFilterChange('date', 'Past')}
-                className={`px-3 py-1 text-sm rounded-full ${
-                  filters.date.includes('Past')
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                Past
-              </button>
-            </div>
-          </div>
+    <div className="bg-gray-100 p-4 rounded-lg shadow">
+      <h2 className="text-xl font-semibold mb-4">Filter Hackathons</h2>
+      
+      <div className="grid gap-4 md:grid-cols-3">
+        {/* Location filter */}
+        <div>
+          <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+            Location
+          </label>
+          <input
+            type="text"
+            id="location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="City, state, or country"
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+        
+        {/* Virtual filter */}
+        <div>
+          <label htmlFor="virtual" className="block text-sm font-medium text-gray-700 mb-1">
+            Virtual Events
+          </label>
+          <select
+            id="virtual"
+            value={virtual}
+            onChange={(e) => setVirtual(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded"
+          >
+            <option value="all">All</option>
+            <option value="yes">Virtual Only</option>
+            <option value="no">In-Person Only</option>
+          </select>
+        </div>
+        
+        {/* Hybrid filter */}
+        <div>
+          <label htmlFor="hybrid" className="block text-sm font-medium text-gray-700 mb-1">
+            Hybrid Events
+          </label>
+          <select
+            id="hybrid"
+            value={hybrid}
+            onChange={(e) => setHybrid(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded"
+          >
+            <option value="all">All</option>
+            <option value="yes">Hybrid Only</option>
+            <option value="no">Non-Hybrid Only</option>
+          </select>
         </div>
       </div>
       
-      {(filters.format.length > 0 || filters.location.length > 0 || filters.date.length > 0) && (
-        <div className="flex items-center justify-between">
-          <div className="flex flex-wrap gap-2">
-            {filters.format.map(format => (
-              <span key={format} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs flex items-center">
-                {format}
-                <button 
-                  onClick={() => handleFilterChange('format', format)}
-                  className="ml-1 text-blue-600 hover:text-blue-800"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-            {filters.location.map(location => (
-              <span key={location} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs flex items-center">
-                {location}
-                <button 
-                  onClick={() => handleFilterChange('location', location)}
-                  className="ml-1 text-blue-600 hover:text-blue-800"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-            {filters.date.map(date => (
-              <span key={date} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs flex items-center">
-                {date}
-                <button 
-                  onClick={() => handleFilterChange('date', date)}
-                  className="ml-1 text-blue-600 hover:text-blue-800"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-          <button 
-            onClick={() => {
-              setFilters({ format: [], location: [], date: [] });
-              onFilterChange({ format: [], location: [], date: [] });
-            }}
-            className="text-sm text-blue-600 hover:text-blue-800"
-          >
-            Clear all
-          </button>
-        </div>
-      )}
+      <div className="mt-4 flex space-x-4 justify-end">
+        <button
+          onClick={resetFilters}
+          className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-100"
+        >
+          Reset
+        </button>
+        <button
+          onClick={applyFilters}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Apply Filters
+        </button>
+      </div>
     </div>
   );
 };
 
-export default FilterOptions;
+export default Filter;
