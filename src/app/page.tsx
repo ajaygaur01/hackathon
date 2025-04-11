@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import Hackathon from './Hackathons/Page';
+import Hackathon from './hackathons/page';
 
 const Home = () => {
   return (
