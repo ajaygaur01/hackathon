@@ -1,4 +1,5 @@
 // src/pages/Components/Filter.tsx
+'use client'
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, X, Filter as FilterIcon } from 'lucide-react';
 

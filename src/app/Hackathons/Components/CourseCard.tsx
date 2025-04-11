@@ -31,13 +31,13 @@ const HackathonCard: React.FC<HackathonCardProps> = ({ hackathon }) => {
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="relative h-48 w-full">
         <img 
-          src={hackathon.banner} 
+          src={hackathon.banner || 'https://via.placeholder.com/600x200'} 
           alt={`${hackathon.name} banner`}
           className="w-full h-full object-cover"
         />
         <div className="absolute top-4 left-4 bg-white p-2 rounded-full shadow-md">
           <img 
-            src={hackathon.logo} 
+            src={hackathon.logo || 'https://via.placeholder.com/150'} 
             alt={`${hackathon.name} logo`}
             className="w-12 h-12 rounded-full"
           />

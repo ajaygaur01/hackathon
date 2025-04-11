@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+'use client'
+import React, { useState } from "react";
+import { useEffect } from "react";
 
 const AiAssistantButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -76,7 +78,7 @@ const AiAssistantButton = () => {
                   />
                 </svg>
               </div>
-              <h3 className="font-bold text-blue-900">AI Assistant</h3>
+              <h3 className="font-bold text-blue-900">Vatika AI</h3>
             </div>
             <div className="flex space-x-2">
               {!isMobile && (
