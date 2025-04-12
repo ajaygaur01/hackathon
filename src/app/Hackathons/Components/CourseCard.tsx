@@ -26,10 +26,12 @@ const HackathonCard: React.FC<HackathonCardProps> = ({ hackathon }) => {
     const durationHours = Math.round(durationMs / (1000 * 60 * 60));
     return `${durationHours} hours`;
   };
+  console.log(hackathon);
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="relative h-48 w-full">
+        {/* {console.log(hackathon.banner,"hehwd")} */}
         <img 
           src={hackathon.banner || 'https://via.placeholder.com/600x200'} 
           alt={`${hackathon.name} banner`}
