@@ -34,14 +34,14 @@ export default function FileUploader() {
                        .replace(/\]$/, '');
 
     // Split into bullet points and clean up
-    const points = cleaned
+    const points: string[] = cleaned
       .split(/\*\s|\n\s*-\s*/) // Split on bullet-like markers
-      .map((p) =>
-        p.replace(/\*\*/g, '') // remove any bold markdown
-         .replace(/^\*+/, '') // remove stray leading *
-         .trim()
+      .map((p: string) =>
+      p.replace(/\*\*/g, '') // remove any bold markdown
+       .replace(/^\*+/, '') // remove stray leading *
+       .trim()
       )
-      .filter((p) => p.length > 0);
+      .filter((p: string) => p.length > 0);
 
     setReviewPoints(points);
     setLoading(false);

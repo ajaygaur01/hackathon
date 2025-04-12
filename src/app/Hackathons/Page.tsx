@@ -1,3 +1,5 @@
+// src/pages/index.tsx
+'use client'
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import CourseCard from "./Components/CourseCard";

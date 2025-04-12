@@ -1,13 +1,12 @@
 'use client';
-import React from 'react';
-import Hackathon from './Hackathons/Page';
+import Compiler from './Compiler/page';
 
 const Home = () => {
   return (
    <>
     <div>
-      <Hackathon />
-    </div>
+        <Compiler />
+      </div>
    </>
   );
 }
