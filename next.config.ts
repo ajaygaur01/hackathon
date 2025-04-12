@@ -3,7 +3,13 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['localhost'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**', // wildcard for any domain
+      },
+    ],
+    domains : ["https://dash.hackathons.hackclub.com"]
   },
   // Updated from experimental.serverComponentsExternalPackages to serverExternalPackages
   serverExternalPackages: ['pdf-parse', 'tesseract.js'],
