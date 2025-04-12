@@ -5,8 +5,6 @@ import Editor from '@monaco-editor/react';
 import { useRouter } from 'next/navigation';
 import { problem as problemData } from '../../Components/problems';
 
-
-
 export default function ProblemPage() {
   const router = useRouter();
   const params = useParams();
@@ -96,9 +94,36 @@ export default function ProblemPage() {
     ]);
   };
 
+  // Helper function to validate test cases
+  interface TestCaseResult {
+    input: string;
+    expectedOutput: string;
+    actualOutput: string;
+    passed: boolean;
+    error: string | null;
+  }
+
+  const validateTestCases = (output: string, examples: any[]): TestCaseResult[] => {
+    return examples.map(example => {
+      // Normalize outputs by trimming whitespace and converting to lowercase for case-insensitive comparison
+      const normalizedOutput = output.trim();
+      const normalizedExpected = example.output.trim();
+      
+      const passed = normalizedOutput === normalizedExpected;
+      
+      return {
+        input: example.input,
+        expectedOutput: example.output,
+        actualOutput: output,
+        passed,
+        error: null
+      };
+    });
+  };
+
   const runCode = async (isSubmission = false) => {
     setIsSubmitting(true);
-    setConsoleView('console');
+    setConsoleView(isSubmission ? 'result' : 'console');
     setResult(null);
   
     if (console.length > 50) {
@@ -106,10 +131,11 @@ export default function ProblemPage() {
     }
   
     try {
+      const inputToUse = isSubmission ? '' : customInput;
       const payload = {
         source_code: editorState.code,
         language_id: getLanguageId(editorState.language),
-        stdin: isSubmission ? '' : customInput,
+        stdin: inputToUse,
       };
   
       addToConsole('input', `Running ${editorState.language} code with ${isSubmission ? 'test cases' : 'custom input'}...`);
@@ -127,16 +153,110 @@ export default function ProblemPage() {
       const data = await response.json();
   
       if (response.ok) {
-        const resultObj: SubmissionResult = {
-          status: data.status.id === 3 ? 'success' : 'error',
-          output: data.stdout,
-          error: data.stderr || data.compile_output,
-          executionTime: data.time,
-          memory: data.memory,
-        };
-  
-        setResult(resultObj);
-        addToConsole('output', data.stdout || data.stderr || data.compile_output);
+        const output = data.stdout || '';
+        const error = data.stderr || data.compile_output || '';
+        const status = data.status.id === 3 ? 'success' : 'error';
+        
+        // Add to console
+        if (output) {
+          addToConsole('output', output);
+        }
+        if (error) {
+          addToConsole('error', error);
+        }
+
+        if (isSubmission && problem) {
+          // For submission, run against all test cases
+          // For each test case, we would normally send a separate API request
+          // Here we'll simulate by checking against expected outputs
+
+          // Run judge API for each test case
+          const testCasesPromises = problem.examples.map(async (example) => {
+            try {
+              const testPayload = {
+                source_code: editorState.code,
+                language_id: getLanguageId(editorState.language),
+                stdin: example.input,
+              };
+              
+              const testResponse = await fetch('https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-RapidAPI-Key': '2195aada2cmsh9c3700ff279885cp1cf1f5jsn3c45763f080d',
+                  'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
+                },
+                body: JSON.stringify(testPayload),
+              });
+              
+              const testData = await testResponse.json();
+              
+              const testOutput = testData.stdout || '';
+              const testError = testData.stderr || testData.compile_output || '';
+              
+              // Normalize outputs and compare
+              const normalizedOutput = testOutput.trim();
+              const normalizedExpected = example.output.trim();
+              const passed = normalizedOutput === normalizedExpected;
+              
+              return {
+                input: example.input,
+                expectedOutput: example.output,
+                actualOutput: testOutput,
+                passed,
+                error: testError || null
+              };
+            } catch (error) {
+              return {
+                input: example.input,
+                expectedOutput: example.output,
+                actualOutput: '',
+                passed: false,
+                error: 'Failed to execute test case'
+              };
+            }
+          });
+          
+          const testCaseResults = await Promise.all(testCasesPromises);
+          
+          // Calculate if all test cases passed
+          const allPassed = testCaseResults.every(tc => tc.passed);
+          
+          setResult({
+            status: allPassed ? 'success' : 'error',
+            output,
+            error,
+            executionTime: data.time,
+            memory: data.memory,
+            testCases: testCaseResults
+          });
+          
+          // Record the submission
+          const submissionId = Date.now().toString();
+          const submission: { id: string; timestamp: number; status: 'success' | 'error'; language: string } = {
+            id: submissionId,
+            timestamp: Date.now(),
+            status: allPassed ? 'success' : 'error',
+            language: editorState.language
+          };
+          
+          // Add to submissions
+          setSubmissions(prev => [submission, ...prev]);
+          
+          // Set to result view
+          setConsoleView('result');
+          
+          addToConsole('info', `Submission ${allPassed ? 'passed' : 'failed'} ${testCaseResults.filter(tc => tc.passed).length}/${testCaseResults.length} test cases`);
+        } else {
+          // For run code, just show the output
+          setResult({
+            status,
+            output,
+            error,
+            executionTime: data.time,
+            memory: data.memory
+          });
+        }
       } else {
         addToConsole('error', 'Failed to execute code.');
       }
@@ -523,249 +643,211 @@ export default function ProblemPage() {
                 </button>
                 {result && (
                   <button
-                    onClick={() => setConsoleView('result')}
-                    className={`font-medium ${
-                      consoleView === 'result'
-                        ? 'text-indigo-600 dark:text-indigo-400'
-                        : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400'
-                    }`}
-                  >
-                    Results
-                  </button>
-                )}
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setConsole([])}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
+                  onClick={() => setConsoleView('result')}
+                  className={`font-medium ${
+                    consoleView === 'result'
+                      ? 'text-indigo-600 dark:text-indigo-400'
+                      : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400'
+                  }`}
                 >
-                  Clear
+                  Result
                 </button>
-                <button
-                  onClick={toggleOutputPanel}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  {showOutputPanel ? (
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  ) : (
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                    </svg>
-                  )}
-                </button>
-              </div>
+              )}
             </div>
-            
-            {showOutputPanel && (
-              <>
-                {/* Console panel */}
-                {consoleView === 'console' && (
-                  <div className="flex-grow overflow-y-auto p-4 font-mono text-sm">
-                    {console.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 italic">
-                      <svg className="h-8 w-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      <p>Run your code to see output here</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-1">
-                      {console.map((entry, idx) => (
-                        <div
-                          key={idx}
-                          className={`py-1 ${
-                            entry.type === 'error'
-                              ? 'text-red-600 dark:text-red-400'
-                              : entry.type === 'output'
-                              ? 'text-green-600 dark:text-green-400'
-                              : entry.type === 'info'
-                              ? 'text-blue-600 dark:text-blue-400'
-                              : 'text-gray-700 dark:text-gray-300'
-                          }`}
+            <div className="flex items-center">
+              <button
+                onClick={toggleOutputPanel}
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none"
+              >
+                {showOutputPanel ? (
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Output panel content */}
+          {showOutputPanel && (
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {consoleView === 'console' && (
+                <div className="flex flex-col h-full">
+                  {/* Console output */}
+                  <div className="flex-1 overflow-y-auto p-4 font-mono text-sm bg-gray-50 dark:bg-gray-900">
+                    {console.map((entry, idx) => (
+                      <div key={idx} className="mb-2">
+                        <span className="text-gray-500 dark:text-gray-400 text-xs">{formatTimestamp(entry.timestamp)} </span>
+                        <span className={`${
+                          entry.type === 'output' ? 'text-green-600 dark:text-green-400' :
+                          entry.type === 'error' ? 'text-red-600 dark:text-red-400' :
+                          entry.type === 'info' ? 'text-blue-600 dark:text-blue-400' :
+                          'text-gray-700 dark:text-gray-300'
+                        }`}>
+                          {entry.content}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Custom input */}
+                  <div className="border-t border-gray-200 dark:border-gray-700 p-3 bg-gray-100 dark:bg-gray-800">
+                    <div className="flex">
+                      <textarea
+                        value={customInput}
+                        onChange={(e) => setCustomInput(e.target.value)}
+                        placeholder="Enter custom input here..."
+                        className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-l-md bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-mono text-sm resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600"
+                        rows={2}
+                      />
+                      <div className="flex flex-col">
+                        <button
+                          onClick={() => runCode(false)}
+                          disabled={isSubmitting}
+                          className="flex-1 px-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded-tr-md font-medium flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
-                          <span className="text-xs text-gray-500 dark:text-gray-500 mr-2">[{formatTimestamp(entry.timestamp)}]</span>
-                          {entry.type === 'input' && '> '}
-                          <pre className="whitespace-pre-wrap inline">{entry.content}</pre>
-                        </div>
-                      ))}
-                      <div ref={el => { if (el) el.scrollIntoView({ behavior: 'smooth' }); }} />
+                          {isSubmitting ? (
+                            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          ) : "Run"}
+                        </button>
+                        <button
+                          onClick={() => runCode(true)}
+                          disabled={isSubmitting}
+                          className="flex-1 px-3 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-br-md font-medium flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        >
+                          {isSubmitting ? (
+                            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          ) : "Submit"}
+                        </button>
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
-              
-              {/* Results panel */}
+
               {consoleView === 'result' && result && (
-                <div className="flex-grow overflow-y-auto">
-                  <div className="p-4">
-                    <div className="mb-4 flex items-center">
-                      <div className={`h-4 w-4 rounded-full mr-2 ${
-                        result.status === 'success' ? 'bg-green-500' : 'bg-red-500'
-                      }`}></div>
-                      <h3 className="font-medium text-lg">
-                        {result.status === 'success' ? 'Execution Successful' : 'Execution Failed'}
-                      </h3>
+                <div className="flex-1 overflow-y-auto p-4">
+                  <div className="mb-4">
+                    <div className="flex items-center">
+                      <span className={`text-lg font-medium flex items-center ${
+                        result.status === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                      }`}>
+                        {result.status === 'success' ? (
+                          <>
+                            <svg className="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            All Test Cases Passed
+                          </>
+                        ) : (
+                          <>
+                            <svg className="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Some Test Cases Failed
+                          </>
+                        )}
+                      </span>
                     </div>
                     
-                    {result.executionTime !== undefined && (
-                      <div className="flex space-x-4 mb-4 text-sm text-gray-600 dark:text-gray-400">
-                        <div>
-                          <span className="font-medium">Time:</span> {result.executionTime} s
-                        </div>
-                        {result.memory && (
-                          <div>
-                            <span className="font-medium">Memory:</span> {result.memory} KB
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    
-                    {result.testCases ? (
+                    <div className="mt-2 flex space-x-4 text-sm text-gray-600 dark:text-gray-400">
+                      <span>Runtime: {result.executionTime ? `${result.executionTime} ms` : 'N/A'}</span>
+                      <span>Memory: {result.memory ? `${result.memory} KB` : 'N/A'}</span>
+                    </div>
+                  </div>
+                  
+                  {result.testCases && (
+                    <div>
+                      <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-3">Test Case Results</h4>
                       <div className="space-y-4">
-                        <h4 className="font-medium text-gray-800 dark:text-gray-200">Test Cases</h4>
-                        {result.testCases.map((tc, idx) => (
+                        {result.testCases.map((testCase, idx) => (
                           <div key={idx} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                             <div className={`px-4 py-2 flex items-center justify-between ${
-                              tc.passed 
-                                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                              testCase.passed 
+                                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                                 : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                             }`}>
-                              <span className="font-medium">
-                                Test Case {idx + 1}: {tc.passed ? 'Passed' : 'Failed'}
-                              </span>
-                              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                {tc.passed ? (
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              <span className="font-medium flex items-center">
+                                {testCase.passed ? (
+                                  <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
                                 ) : (
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
                                 )}
-                              </svg>
+                                Test Case {idx + 1}
+                              </span>
+                              <button
+                                className="text-xs hover:underline"
+                                // onClick={() => console.log('View Details for Test Case', idx + 1)}
+                              >
+                                {testCase.passed ? 'Details' : 'Show Issue'}
+                              </button>
                             </div>
-                            <div className="p-3 text-sm">
+                            <div className="p-3 bg-white dark:bg-gray-800">
                               <div className="mb-2">
-                                <span className="block font-medium text-gray-700 dark:text-gray-300 mb-1">Input:</span>
-                                <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-x-auto">{tc.input}</pre>
+                                <span className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Input:</span>
+                                <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-xs font-mono overflow-x-auto max-h-20">
+                                  {testCase.input}
+                                </pre>
                               </div>
-                              <div className="mb-2">
-                                <span className="block font-medium text-gray-700 dark:text-gray-300 mb-1">Expected Output:</span>
-                                <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-x-auto">{tc.expectedOutput}</pre>
-                              </div>
-                              <div className="mb-2">
-                                <span className="block font-medium text-gray-700 dark:text-gray-300 mb-1">Your Output:</span>
-                                <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-x-auto">{tc.actualOutput}</pre>
-                              </div>
-                              {tc.error && (
+                              <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <span className="block font-medium text-red-600 dark:text-red-400 mb-1">Error:</span>
-                                  <pre className="bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 p-2 rounded overflow-x-auto">{tc.error}</pre>
+                                  <span className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Expected Output:</span>
+                                  <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-xs font-mono overflow-x-auto max-h-20">
+                                    {testCase.expectedOutput}
+                                  </pre>
+                                </div>
+                                <div>
+                                  <span className={`block text-xs font-medium mb-1 ${
+                                    testCase.passed
+                                      ? 'text-gray-500 dark:text-gray-400'
+                                      : 'text-red-600 dark:text-red-400'
+                                  }`}>
+                                    Your Output:
+                                  </span>
+                                  <pre className={`p-2 rounded text-xs font-mono overflow-x-auto max-h-20 ${
+                                    testCase.passed
+                                      ? 'bg-gray-100 dark:bg-gray-900'
+                                      : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+                                  }`}>
+                                    {testCase.actualOutput || '(No output)'}
+                                  </pre>
+                                </div>
+                              </div>
+                              {testCase.error && (
+                                <div className="mt-2">
+                                  <span className="block text-xs font-medium text-red-600 dark:text-red-400 mb-1">Error:</span>
+                                  <pre className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-2 rounded text-xs font-mono text-red-800 dark:text-red-300 overflow-x-auto max-h-20">
+                                    {testCase.error}
+                                  </pre>
                                 </div>
                               )}
                             </div>
                           </div>
                         ))}
                       </div>
-                    ) : (
-                      <div>
-                        {result.output && (
-                          <div className="mb-4">
-                            <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Output</h4>
-                            <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg overflow-x-auto max-h-60 text-sm">
-                              {result.output}
-                            </pre>
-                          </div>
-                        )}
-                        
-                        {result.error && (
-                          <div>
-                            <h4 className="font-medium text-red-600 dark:text-red-400 mb-2">Error</h4>
-                            <pre className="bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 p-3 rounded-lg overflow-x-auto max-h-60 text-sm">
-                              {result.error}
-                            </pre>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
-              
-              {/* Controls & Input */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Custom Input
-                  </label>
-                  <textarea
-                    className="w-full h-20 px-3 py-2 text-gray-700 dark:text-gray-200 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 font-mono text-sm resize-none"
-                    placeholder="Enter your custom input here..."
-                    value={customInput}
-                    onChange={(e) => setCustomInput(e.target.value)}
-                  />
-                </div>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => runCode(false)}
-                    disabled={isSubmitting}
-                    className={`flex-1 flex justify-center items-center ${
-                      isSubmitting 
-                        ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed' 
-                        : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
-                    } text-gray-800 dark:text-gray-200 font-medium py-2 px-4 rounded-lg transition-colors`}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-800 dark:text-gray-200" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Running...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Run Code
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => runCode(true)}
-                    disabled={isSubmitting}
-                    className={`flex-1 flex justify-center items-center ${
-                      isSubmitting
-                        ? 'bg-indigo-400 cursor-not-allowed'
-                        : 'bg-indigo-600 hover:bg-indigo-700'
-                    } text-white font-medium py-2 px-4 rounded-lg transition-colors`}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Submit
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </>
+            </div>
           )}
         </div>
       </div>
     </div>
   </div>
-);
+  );
 }
-                        

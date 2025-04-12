@@ -1246,7 +1246,7 @@ export const Page = () => {
           name="description"
           content="Browse the best hackathons for students"
         />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="./Hack_Coding.jpeg" />
       </Head>
   
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
