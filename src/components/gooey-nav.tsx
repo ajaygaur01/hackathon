@@ -10,7 +10,7 @@ export function GooeyNav() {
 
   const navItems = [
     { label: "Home", href: "/" },
-    { label: "Hackcathons", href: "/Hackathons" },
+    { label: "Hackathons", href: "/Hackathons" },
     { label: "Ai-Playground", href: "/ai-playground" },
     { label: "DSA", href: "/dsa" },
     { label: "Ai-Quizbot", href: "/quizbot" },
