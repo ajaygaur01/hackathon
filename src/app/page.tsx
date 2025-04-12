@@ -17,7 +17,7 @@ export default function Home() {
       {/* <div className="z-1000">
         <BlobCursor />
       </div> */}
-      <NavBar />
+      {/* <NavBar /> */}
 
       <HeroSection />
 
