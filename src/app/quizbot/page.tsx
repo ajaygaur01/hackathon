@@ -454,7 +454,7 @@ const parseQuizText = (quizText: string): Question[] => {
             AI-Powered Quiz Generator
           </h1>
           <p className="text-blue-200 text-lg max-w-2xl mx-auto">
-            Upload your notes or study materials and get instant MCQ questions using our Gemini-powered AI engine
+            Upload your notes or study materials and get instant MCQ questions using our AI-powered engine
           </p>
         </div>
         
@@ -775,7 +775,7 @@ const parseQuizText = (quizText: string): Question[] => {
                 </p>
                 <div className="mt-4 text-xs text-blue-400 font-mono flex items-center justify-center space-x-1">
                   <span className="inline-block w-3 h-3 bg-cyan-400 rounded-full animate-ping"></span>
-                  <span>Gemini API connected</span>
+                  <span></span>
                 </div>
               </div>
             )}

@@ -95,31 +95,31 @@ export default function ProblemPage() {
   };
 
   // Helper function to validate test cases
-  interface TestCaseResult {
+  type TestCaseResult = {
     input: string;
     expectedOutput: string;
     actualOutput: string;
     passed: boolean;
     error: string | null;
-  }
-
-  const validateTestCases = (output: string, examples: any[]): TestCaseResult[] => {
-    return examples.map(example => {
-      // Normalize outputs by trimming whitespace and converting to lowercase for case-insensitive comparison
-      const normalizedOutput = output.trim();
-      const normalizedExpected = example.output.trim();
-      
-      const passed = normalizedOutput === normalizedExpected;
-      
-      return {
-        input: example.input,
-        expectedOutput: example.output,
-        actualOutput: output,
-        passed,
-        error: null
-      };
-    });
   };
+
+  // const validateTestCases = (output: string, examples: any[]): TestCaseResult[] => {
+  //   return examples.map(example => {
+  //     // Normalize outputs by trimming whitespace and converting to lowercase for case-insensitive comparison
+  //     const normalizedOutput = output.trim();
+  //     const normalizedExpected = example.output.trim();
+      
+  //     const passed = normalizedOutput === normalizedExpected;
+      
+  //     return {
+  //       input: example.input,
+  //       expectedOutput: example.output,
+  //       actualOutput: output,
+  //       passed,
+  //       error: null
+  //     };
+  //   });
+  // };
 
   const runCode = async (isSubmission = false) => {
     setIsSubmitting(true);
@@ -195,14 +195,14 @@ export default function ProblemPage() {
               const testError = testData.stderr || testData.compile_output || '';
               
               // Normalize outputs and compare
-              const normalizedOutput = testOutput.trim();
+              const normalizedOutput = output.trim();
               const normalizedExpected = example.output.trim();
               const passed = normalizedOutput === normalizedExpected;
               
               return {
                 input: example.input,
                 expectedOutput: example.output,
-                actualOutput: testOutput,
+                actualOutput: output,
                 passed,
                 error: testError || null
               };
@@ -215,8 +215,7 @@ export default function ProblemPage() {
                 error: 'Failed to execute test case'
               };
             }
-          });
-          
+          });  
           const testCaseResults = await Promise.all(testCasesPromises);
           
           // Calculate if all test cases passed
@@ -233,7 +232,12 @@ export default function ProblemPage() {
           
           // Record the submission
           const submissionId = Date.now().toString();
-          const submission: { id: string; timestamp: number; status: 'success' | 'error'; language: string } = {
+          const submission: { 
+            id: string; 
+            timestamp: number; 
+            status: 'success' | 'error'; 
+            language: string; 
+          } = {
             id: submissionId,
             timestamp: Date.now(),
             status: allPassed ? 'success' : 'error',
@@ -849,5 +853,5 @@ export default function ProblemPage() {
       </div>
     </div>
   </div>
-  );
+);
 }
