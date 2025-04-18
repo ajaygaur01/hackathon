@@ -144,7 +144,7 @@ export default function ProblemPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-RapidAPI-Key': '3c71eba05cmsh4884e715d9844e7p1efd0ejsn086db59e1831',
+          'X-RapidAPI-Key': '1ef1687d9cmsh3e39cff50fb7356p1ac84ejsnc7dca2023bfc',
           'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
         },
         body: JSON.stringify(payload),
@@ -183,7 +183,7 @@ export default function ProblemPage() {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  'X-RapidAPI-Key': '3c71eba05cmsh4884e715d9844e7p1efd0ejsn086db59e1831',
+                  'X-RapidAPI-Key': '1ef1687d9cmsh3e39cff50fb7356p1ac84ejsnc7dca2023bfc',
                   'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
                 },
                 body: JSON.stringify(testPayload),
