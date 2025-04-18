@@ -1,51 +1,92 @@
-'use client'
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 const AiAssistantButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
-    { text: "How can I help you with your tech courses?", isUser: false }
+    {
+      text: "Hi! I can help you generate hackathon project ideas. Just tell me a theme or technology you're interested in.",
+      isUser: false,
+    },
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Function to get project ideas from backend API
+  const getProjectIdeas = async (theme: string) => {
+    try {
+      setIsTyping(true);
+      
+      const response = await fetch('/api/Hackathons', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ theme }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch project ideas");
+      }
+
+      const data = await response.json();
+      return data.response;
+    } catch (error) {
+      console.error("Error fetching project ideas:", error);
+      return "Sorry, I couldn't generate project ideas at the moment. Please try again later.";
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
   // Check if device is mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640);
     };
-    
+
     // Initial check
     checkMobile();
-    
+
     // Listen for resize events
-    window.addEventListener('resize', checkMobile);
-    
+    window.addEventListener("resize", checkMobile);
+
     // Cleanup
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim() === "") return;
-    
+
     // Add user message
-    setMessages([...messages, { text: input, isUser: true }]);
+    setMessages((prev) => [...prev, { text: input, isUser: true }]);
+    const userQuery = input;
     setInput("");
-    
-    // Simulate AI response
+
+    // Show typing indicator
     setIsTyping(true);
-    setTimeout(() => {
-      setMessages(prev => [
-        ...prev, 
-        { text: "I'm here to help with your questions about Hackathons! What specific topic would you like to explore?", isUser: false }
+
+    try {
+      // Get response from backend API
+      const response = await getProjectIdeas(userQuery);
+
+      // Add AI response
+      setMessages((prev) => [...prev, { text: response, isUser: false }]);
+    } catch (error) {
+      // Handle error
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: "Sorry, I'm having trouble connecting to my brain. Please try again later.",
+          isUser: false,
+        },
       ]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>): void => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -55,11 +96,13 @@ const AiAssistantButton = () => {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {isOpen && (
-        <div className={`bg-white rounded-2xl shadow-2xl border border-blue-100 transform transition-all duration-300 ease-in-out ${
-          isMobile 
-            ? "fixed inset-x-2 bottom-20 top-20 w-auto" 
-            : "p-4 mb-4 w-96"
-        }`}>
+        <div
+          className={`bg-white rounded-2xl shadow-2xl border border-blue-100 transform transition-all duration-300 ease-in-out ${
+            isMobile
+              ? "fixed inset-x-2 bottom-20 top-20 w-auto"
+              : "p-4 mb-4 w-96"
+          }`}
+        >
           <div className="flex justify-between items-center p-4 border-b">
             <div className="flex items-center space-x-2">
               <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
@@ -82,7 +125,10 @@ const AiAssistantButton = () => {
             </div>
             <div className="flex space-x-2">
               {!isMobile && (
-                <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100">
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -99,7 +145,10 @@ const AiAssistantButton = () => {
                   </svg>
                 </button>
               )}
-              <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -117,22 +166,32 @@ const AiAssistantButton = () => {
               </button>
             </div>
           </div>
-          
-          <div className={`bg-gray-50 overflow-y-auto space-y-4 p-4 ${
-            isMobile 
-              ? "flex-1 h-full" 
-              : "h-80 rounded-xl mb-4"
-          }`} style={{ height: isMobile ? "calc(100% - 130px)" : undefined }}>
+
+          <div
+            className={`bg-gray-50 overflow-y-auto space-y-4 p-4 ${
+              isMobile ? "flex-1 h-full" : "h-80 rounded-xl mb-4"
+            }`}
+            style={{ height: isMobile ? "calc(100% - 130px)" : undefined }}
+          >
             {messages.map((msg, index) => (
-              <div key={index} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
+              <div
+                key={index}
+                className={`flex ${
+                  msg.isUser ? "justify-end" : "justify-start"
+                }`}
+              >
                 <div
                   className={`max-w-3/4 p-3 rounded-2xl ${
                     msg.isUser
-                      ? 'bg-blue-600 text-white rounded-br-none'
-                      : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm'
+                      ? "bg-blue-600 text-white rounded-br-none"
+                      : "bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm"
                   }`}
                 >
-                  <p className={`text-sm ${msg.isUser ? 'text-white' : 'text-gray-700'}`}>
+                  <p
+                    className={`text-sm ${
+                      msg.isUser ? "text-white" : "text-gray-700"
+                    } whitespace-pre-line`}
+                  >
                     {msg.text}
                   </p>
                 </div>
@@ -142,28 +201,39 @@ const AiAssistantButton = () => {
               <div className="flex justify-start">
                 <div className="bg-white text-gray-800 border border-gray-200 rounded-2xl rounded-bl-none p-3 shadow-sm">
                   <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    <div
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0ms" }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "150ms" }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "300ms" }}
+                    ></div>
                   </div>
                 </div>
               </div>
             )}
           </div>
-          
-          <div className={`bg-gray-50 rounded-xl p-2 shadow-inner flex ${
-            isMobile ? "fixed bottom-2 left-2 right-2" : ""
-          }`}>
+
+          <div
+            className={`bg-gray-50 rounded-xl p-2 shadow-inner flex ${
+              isMobile ? "fixed bottom-2 left-2 right-2" : ""
+            }`}
+          >
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               className="flex-1 bg-transparent border-none p-2 text-gray-700 focus:outline-none focus:ring-0 resize-none"
-              placeholder="Ask anything..."
+              placeholder="Enter a hackathon theme..."
               rows={1}
-              style={{ minHeight: '40px', maxHeight: '100px' }}
+              style={{ minHeight: "40px", maxHeight: "100px" }}
             />
-            <button 
+            <button
               onClick={handleSend}
               disabled={input.trim() === ""}
               className={`flex items-center justify-center rounded-xl px-4 ml-2 transition-colors ${
@@ -188,10 +258,10 @@ const AiAssistantButton = () => {
               </svg>
             </button>
           </div>
-          
+
           {!isMobile && (
             <div className="mt-3 flex justify-center">
-              <p className="text-xs text-gray-500">Powered by Claude AI</p>
+              <p className="text-xs text-gray-500">Powered by Gemini AI</p>
             </div>
           )}
         </div>
