@@ -225,8 +225,11 @@ export default function Builder() {
 
                         setLoading(true);
                         try {
-                          const stepsResponse = await axios.post('/api/chat', {
-                            messages: [...llmMessages, newMessage]
+                          const stepsResponse = await axios.post(`${BACKEND_URL}/chat`, {
+                            messages : [...llmMessages, newMessage].map(content => ({
+                              role: "user",
+                              parts: [content]
+                            }))
                           });
                           
                           setLlmMessages(x => [...x, newMessage, {
