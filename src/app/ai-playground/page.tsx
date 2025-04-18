@@ -50,13 +50,13 @@ export default function Home() {
     <div className="relative min-h-screen bg-black flex items-center justify-center overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 w-full h-full bg-black">
-        <Lightning
-          size={150}
-          gap={40}
-          speed={1.5}
-          color="blue"
-          className="w-full h-full opacity-50"
-        />
+      <Lightning
+        hue={220}
+        xOffset={0}
+        speed={1}
+        intensity={1}
+        size={1}
+      />
       </div>
       <Spotlight
         className="absolute top-0 left-0 h-full w-full"

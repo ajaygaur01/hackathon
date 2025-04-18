@@ -228,7 +228,7 @@ export default function Builder() {
                           const stepsResponse = await axios.post(`${BACKEND_URL}/chat`, {
                             messages : [...llmMessages, newMessage].map(content => ({
                               role: "user",
-                              parts: [content]
+                              parts: [content.content]
                             }))
                           });
                           
