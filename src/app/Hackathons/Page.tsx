@@ -215,9 +215,9 @@ export const Page = () => {
       start: "2025-05-31T14:00:00.000Z",
       end: "2025-06-01T22:30:00.000Z",
       createdAt: "2025-02-19T21:59:14.364Z",
-      logo: "https://dash.hackathons.hackclub.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDQzMCwicHVyIjoiYmxvYl9pZCJ9fQ==--adfe3638dc395e16161e9fe2264dc957fa119190/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fbGltaXQiOlsxMjgsMTI4XX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--aed3fb345df101cd22ac6ef68ee4e4dbe8543f96/hacknight.png",
+      logo: "logo10.png",
       banner:
-        "https://dash.hackathons.hackclub.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDQzMSwicHVyIjoiYmxvYl9pZCJ9fQ==--ebe984cecba63646f59e80f14016f7322a4dc49a/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fbGltaXQiOlsxOTIwLDEwODBdfSwicHVyIjoidmFyaWF0aW9uIn19--0cb308658042f2d6b36d86bf03f4df0c63838d0b/Screenshot%202025-02-19%20at%204.57.32%E2%80%AFPM.png",
+        "banner10.png",
       city: "Cambridge",
       state: "Massachusetts",
       country: "United States",
