@@ -28,8 +28,7 @@ export const Page = () => {
       end: "2025-04-13T01:00:00.000Z",
       createdAt: "2025-03-27T01:38:35.012Z",
       logo: "/logo1.png",
-      banner:
-        "/banner1.png",
+      banner: "/banner1.png",
       city: "Arlington Heights",
       state: "Illinois",
       country: "United States",
@@ -40,6 +39,7 @@ export const Page = () => {
       hybrid: false,
       mlhAssociated: false,
       apac: false,
+      themes: ["Sustainable Smart Cities", "IoT Innovation", "Green Technology"]
     },
     {
       id: "pmyIwD",
@@ -49,8 +49,7 @@ export const Page = () => {
       end: "2025-07-27T15:30:00.000Z",
       createdAt: "2025-03-27T00:00:59.814Z",
       logo: "/logo2.png",
-      banner:
-      "/banner2.png",
+      banner: "/banner2.png",
       city: "Hangzhou",
       state: "Chekiang Province",
       country: "China",
@@ -61,6 +60,7 @@ export const Page = () => {
       hybrid: false,
       mlhAssociated: false,
       apac: true,
+      themes: ["Financial Technology", "Cryptocurrency", "Banking Solutions"],
     },
     {
       id: "01xIj2",
@@ -70,8 +70,7 @@ export const Page = () => {
       end: "2025-05-21T04:00:00.000Z",
       createdAt: "2025-03-26T17:18:46.209Z",
       logo: "/logo3.png",
-      banner:
-      "/banner3.png",
+      banner: "/banner3.png",
       city: null,
       state: null,
       country: null,
@@ -82,6 +81,7 @@ export const Page = () => {
       hybrid: false,
       mlhAssociated: false,
       apac: false,
+      themes: ["AI for Accessibility", "Remote Learning Tools", "Digital Inclusion", "Cloud Computing"]
     },
     {
       id: "pllI62",
@@ -91,8 +91,7 @@ export const Page = () => {
       end: "2025-04-20T23:00:00.000Z",
       createdAt: "2025-03-19T16:13:59.959Z",
       logo: "/logo4.png",
-      banner:
-      "/banner4.png",
+      banner: "/banner4.png",
       city: null,
       state: null,
       country: null,
@@ -103,6 +102,7 @@ export const Page = () => {
       hybrid: false,
       mlhAssociated: false,
       apac: false,
+      themes: ["Education Tech", "Learning Platforms", "Student Tools"]
     },
     {
       id: "3zvImb",
@@ -112,8 +112,7 @@ export const Page = () => {
       end: "2025-04-06T17:00:00.000Z",
       createdAt: "2025-03-08T20:27:04.904Z",
       logo: "/logo5.png",
-      banner:
-        "/banner5.png",
+      banner: "/banner5.png",
       city: "Vienna",
       state: "Virginia",
       country: "United States",
@@ -124,6 +123,8 @@ export const Page = () => {
       hybrid: false,
       mlhAssociated: false,
       apac: false,
+
+      themes: ["Space Exploration", "Astronomy Applications", "Satellite Data"]
     },
     {
       id: "rbQIPd",
@@ -133,8 +134,7 @@ export const Page = () => {
       end: "2025-04-13T21:00:00.000Z",
       createdAt: "2025-03-04T23:07:08.836Z",
       logo: "/warriorhacksfilled.png",
-      banner:
-        "/warriorhackbanner.png",
+      banner: "/warriorhackbanner.png",
       city: "Fremont",
       state: "California",
       country: "United States",
@@ -145,6 +145,7 @@ export const Page = () => {
       hybrid: false,
       mlhAssociated: false,
       apac: false,
+      themes: ["Cybersecurity and Digital Defense", "Blockchain Applications", "Privacy Tech"]
     },
     {
       id: "0QMILv",
@@ -154,8 +155,7 @@ export const Page = () => {
       end: "2025-04-06T12:00:00.000Z",
       createdAt: "2025-03-04T05:47:00.448Z",
       logo: "/altologo.png",
-      banner:
-        "/altobanner.png",
+      banner: "/altobanner.png",
       city: "Sunnyvale",
       state: "California",
       country: "United States",
@@ -166,6 +166,7 @@ export const Page = () => {
       hybrid: false,
       mlhAssociated: false,
       apac: false,
+      themes: ["Climate Action", "Environmental Monitoring", "Renewable Energy"]
     },
     {
       id: "rD1I8X",
@@ -186,6 +187,7 @@ export const Page = () => {
       hybrid: false,
       mlhAssociated: false,
       apac: false,
+      themes: ["Health Tech Innovation", "BioTech Solutions", "Mental Health Apps", "Medical Devices"]
     },
     {
       id: "3KNI41",
@@ -195,8 +197,7 @@ export const Page = () => {
       end: "2025-03-24T04:00:00.000Z",
       createdAt: "2025-02-22T23:00:45.511Z",
       logo: "/blulogo.png",
-      banner:
-        "/bluebanner.JPEG",
+      banner: "/bluebanner.JPEG",
       city: "San Jose",
       state: "California",
       country: "United States",
@@ -207,6 +208,7 @@ export const Page = () => {
       hybrid: false,
       mlhAssociated: false,
       apac: false,
+      themes: ["Robotics", "Automation", "Industrial IoT"]
     },
     {
       id: "3dzIoG",
@@ -216,8 +218,7 @@ export const Page = () => {
       end: "2025-06-01T22:30:00.000Z",
       createdAt: "2025-02-19T21:59:14.364Z",
       logo: "logo10.png",
-      banner:
-        "banner10.png",
+      banner: "banner10.png",
       city: "Cambridge",
       state: "Massachusetts",
       country: "United States",
@@ -227,7 +228,7 @@ export const Page = () => {
       virtual: false,
       hybrid: false,
       mlhAssociated: false,
-      apac: false,
+      apac: false
     },
     {
       id: "3aDIq8",
@@ -237,8 +238,7 @@ export const Page = () => {
       end: "2025-06-22T18:00:00.000Z",
       createdAt: "2025-02-19T20:52:38.740Z",
       logo: "https://dash.hackathons.hackclub.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDQyOCwicHVyIjoiYmxvYl9pZCJ9fQ==--cbbfb24acbe22c8f6cdc4b7f600c43a8f7f24546/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2xpbWl0IjpbMTI4LDEyOF19LCJwdXIiOiJ2YXJpYXRpb24ifX0=--a686d78007605c5872c1fba506536ea754ff5af9/original.webp",
-      banner:
-        "https://dash.hackathons.hackclub.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDQyOSwicHVyIjoiYmxvYl9pZCJ9fQ==--36e899e52245b57da4d642353399491d9de1e6da/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fbGltaXQiOlsxOTIwLDEwODBdfSwicHVyIjoidmFyaWF0aW9uIn19--0cb308658042f2d6b36d86bf03f4df0c63838d0b/Screenshot%202025-02-19%20at%2012.45.20%E2%80%AFPM.png",
+      banner: "https://dash.hackathons.hackclub.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDQyOSwicHVyIjoiYmxvYl9pZCJ9fQ==--36e899e52245b57da4d642353399491d9de1e6da/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fbGltaXQiOlsxOTIwLDEwODBdfSwicHVyIjoidmFyaWF0aW9uIn19--0cb308658042f2d6b36d86bf03f4df0c63838d0b/Screenshot%202025-02-19%20at%2012.45.20%E2%80%AFPM.png",
       city: "Vancouver",
       state: "British Columbia",
       country: "Canada",
@@ -248,49 +248,7 @@ export const Page = () => {
       virtual: false,
       hybrid: false,
       mlhAssociated: false,
-      apac: false,
-    },
-    {
-      id: "rg2IRD",
-      name: "Submersion",
-      website: "https://submersion.dev/",
-      start: "2025-07-08T16:00:00.000Z",
-      end: "2025-07-12T16:00:00.000Z",
-      createdAt: "2025-02-14T20:29:17.752Z",
-      logo: "https://dash.hackathons.hackclub.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDQyMCwicHVyIjoiYmxvYl9pZCJ9fQ==--b1fc38bafe3c9d4c995c7adb71aef2ae312e2da4/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fbGltaXQiOlsxMjgsMTI4XX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--aed3fb345df101cd22ac6ef68ee4e4dbe8543f96/logo.png",
-      banner:
-        "https://dash.hackathons.hackclub.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDQxOCwicHVyIjoiYmxvYl9pZCJ9fQ==--2936b67cd01f5c47f31b89f8a2e0845f065c3228/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fbGltaXQiOlsxOTIwLDEwODBdfSwicHVyIjoidmFyaWF0aW9uIn19--0cb308658042f2d6b36d86bf03f4df0c63838d0b/banner.png",
-      city: "Lakeport",
-      state: "California",
-      country: "United States",
-      countryCode: "US",
-      latitude: 39.049962386729,
-      longitude: -122.917326706508,
-      virtual: false,
-      hybrid: false,
-      mlhAssociated: false,
-      apac: false,
-    },
-    {
-      id: "3GnIL2",
-      name: "Viking Hacks",
-      website: "https://www.vikinghacks.com/",
-      start: "2025-02-15T16:00:00.000Z",
-      end: "2025-02-16T05:00:00.000Z",
-      createdAt: "2025-01-24T03:34:05.927Z",
-      logo: "https://dash.hackathons.hackclub.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDM3NCwicHVyIjoiYmxvYl9pZCJ9fQ==--39e2fbf7c1d29d0159666386a7a415582167254c/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fbGltaXQiOlsxMjgsMTI4XX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--aed3fb345df101cd22ac6ef68ee4e4dbe8543f96/v_logo_fit.png",
-      banner:
-        "https://dash.hackathons.hackclub.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDM3NSwicHVyIjoiYmxvYl9pZCJ9fQ==--a75cc938ab9cfc54c3372fee130577a6e7d7ce38/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fbGltaXQiOlsxOTIwLDEwODBdfSwicHVyIjoidmFyaWF0aW9uIn19--797f7952fb61db955e058b888e66d8ecb495e15b/Irvington-HS_photo.jpg",
-      city: "Fremont",
-      state: "California",
-      country: "United States",
-      countryCode: "US",
-      latitude: 37.524887089396,
-      longitude: -121.967702844165,
-      virtual: false,
-      hybrid: false,
-      mlhAssociated: false,
-      apac: false,
+      apac: false
     },
     {
       id: "3aDIqA",
@@ -1163,8 +1121,14 @@ export const Page = () => {
         // const data = await response.json();
   
         // Using sample data for now
-        setAllHackathons(hackathons);
-        applyFilters(hackathons);
+        setAllHackathons(hackathons.map(hackathon => ({
+          ...hackathon,
+          themes: hackathon.themes || []
+        })));
+        applyFilters((hackathons.map(hackathon => ({
+          ...hackathon,
+          themes: hackathon.themes || []
+        }))));
         setLoading(false);
       } catch (error) {
         console.error("Error fetching hackathons:", error);

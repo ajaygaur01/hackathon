@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Calendar, Clock, Globe } from 'lucide-react';
+import { MapPin, Calendar, Clock, Globe, Tag } from 'lucide-react';
 
 const HackathonCard: React.FC<HackathonCardProps> = ({ hackathon }) => {
 
@@ -26,6 +26,7 @@ const HackathonCard: React.FC<HackathonCardProps> = ({ hackathon }) => {
     const durationHours = Math.round(durationMs / (1000 * 60 * 60));
     return `${durationHours} hours`;
   };
+  // console.log(hackathon);
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -74,6 +75,20 @@ const HackathonCard: React.FC<HackathonCardProps> = ({ hackathon }) => {
               {hackathon.website.replace('https://', '')}
             </a>
           </div>
+          
+          {/* Display themes if they exist */}
+          {hackathon.themes && hackathon.themes.length > 0 && (
+            <div className="flex items-start text-gray-600">
+              <Tag className="w-5 h-5 mr-2 text-gray-500 mt-1" />
+              <div className="flex flex-wrap gap-2">
+                {hackathon.themes.map((theme: string, index: number) => (
+                  <span key={index} className="px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-sm">
+                  {theme}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         
         <div className="flex flex-wrap gap-2">

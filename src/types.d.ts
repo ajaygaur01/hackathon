@@ -17,6 +17,7 @@ interface Hackathon {
     hybrid: boolean;
     mlhAssociated: boolean;
     apac: boolean;
+    themes: string[];
   }
 
   interface Problem {
