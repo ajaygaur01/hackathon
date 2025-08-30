@@ -41,7 +41,9 @@ export default function Home() {
         throw new Error(data.error || "Failed to generate image");
       }
 
+      console.log(data.imageUrl)
       setImage(data.imageUrl);
+      
       toast.success("Image generated successfully!");
     } catch (error) {
       toast.error("Failed to generate image. Please try again.");

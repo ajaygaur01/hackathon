@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
+
 export function GooeyNav() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
@@ -15,6 +16,7 @@ export function GooeyNav() {
     { label: "DSA", href: "/dsa" },
     { label: "Ai-Quizbot", href: "/quizbot" },
     { label: "Ai Code review", href: "/reviewbot" },
+    { label : "Network", href : "/imagegen"}
   ]
 
   return (
